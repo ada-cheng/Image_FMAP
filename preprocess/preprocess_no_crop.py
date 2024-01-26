@@ -4,14 +4,12 @@ import numpy as np
 import os
 from typing import List, Tuple
 from loguru import logger
-from dino import Dino_rgb_extractor
 import argparse
 import time
 from glob import glob
 import json
 from PIL import Image, ImageDraw
 from utils.util_preprocess import resize_, foreground_preprocess
-from extractor import ViTExtractor
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
@@ -133,6 +131,7 @@ if __name__ == "__main__":
     data_dir = 'data/SPair-71k' 
     save_path = 'pair-feat/SPair-71k'
     model_type = 'dinov2_vitb14'
+    
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     categories = os.listdir(os.path.join(data_dir, 'ImageAnnotation'))

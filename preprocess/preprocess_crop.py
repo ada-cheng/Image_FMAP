@@ -4,14 +4,12 @@ import numpy as np
 import os
 from typing import List, Tuple
 from loguru import logger
-from dino import Dino_rgb_extractor
 import argparse
 import time
 from glob import glob
 import json
 from PIL import Image, ImageDraw
 from utils.util_preprocess import resize_, foreground_preprocess
-from extractor import ViTExtractor
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
