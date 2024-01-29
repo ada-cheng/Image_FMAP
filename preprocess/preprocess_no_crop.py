@@ -118,14 +118,6 @@ def extract_pair_features(model,save_path, files, category, layer=11, img_size=8
 
           torch.save(img2_desc, f'{save_path}/{model}_{category}_{layer}_{facet}_np/{pair_idx}_2.pt')
        
-     
-       
-          
-        if pair_idx > 100:
-            break
-    
-
-
 
 if __name__ == "__main__":
     data_dir = 'data/SPair-71k' 
