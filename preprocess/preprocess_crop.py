@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from utils.util_preprocess import resize_, foreground_preprocess
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
+from extractor_dino import ViTExtractor
 
 
 def set_pixels_outside_box(img, bbox):
