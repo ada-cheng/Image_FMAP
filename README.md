@@ -2,6 +2,8 @@
 
 This repository is the official implementation of the paper “Image Feature Consensus with Deep Functional Maps”.
 
+![image](teaser.jpg)
+
 ### Data Preprocess
 The Image Features can be generated via the command in [DATA.md](./assets/DATA.md).
 
