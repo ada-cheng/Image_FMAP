@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from src.functional_map_gpu import Functional_Map
 from copy import deepcopy
+from flash_attn import flash_attn_qkvpacked_func, flash_attn_func
 import math
 
 def positional_encoding(seq_length, feature_dim):
@@ -27,11 +28,14 @@ def MLP(channels: list, do_bn=True):
 
 def attention(query, key, value):
     dim = query.shape[1]
-    scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
+  
+    scores = torch.matmul(query.permute(0, 2, 3, 1), key.permute(0, 2, 1, 3)) / dim ** 0.5
+     
     torch.cuda.empty_cache()
-    prob = torch.nn.functional.softmax(scores, dim=-1)
+    prob = torch.nn.functional.softmax(scores, dim=-1) # shape: (batch_size, num_heads, num_points, num_points)
     torch.cuda.empty_cache()
-    result = torch.einsum("bhnm,bdhm->bdhn", prob, value)
+  
+    result = torch.matmul(prob, value.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
     torch.cuda.empty_cache()
     return result, prob
 
@@ -50,11 +54,17 @@ class MultiHeadedAttention(nn.Module):
     def forward(self, query, key, value):
         batch_dim = query.size(0)
         query, key, value = [ll(x).view(batch_dim, self.dim, self.num_heads, -1) for ll, x in zip(self.proj, (query, key, value))]
-        x, _ = attention(query, key, value)
+        # q : (batch_size, seqlen, nheads, headdim)
+        
+        q = query.permute(0, 3, 2, 1).reshape(batch_dim,-1, self.num_heads, self.dim).half()
+        k = key.permute(0, 3, 2, 1).reshape(batch_dim, -1, self.num_heads, self.dim).half()
+        v = value.permute(0, 3, 2, 1).reshape(batch_dim, -1, self.num_heads, self.dim).half()
+        out = flash_attn_func(q, k, v)
+        x = out.permute(0, 2, 3, 1).reshape(batch_dim, self.dim * self.num_heads, -1).float()
+  
         return self.merge(x.contiguous().view(batch_dim, self.dim * self.num_heads, -1))
 
 
-    
 class AttentionalPropagation(nn.Module):
     def __init__(self, feature_dim: int, num_heads: int):
         super().__init__()
@@ -73,7 +83,7 @@ class CrossAttentionRefinementNet(nn.Module):
 
         self.attention_type = attention_type
         if attention_type == "normal":
-            additional_dim = 0 
+            additional_dim = 0 # 这个目前没有什么用
         else:
             raise Exception("Attention type not recognized")
 
@@ -104,7 +114,9 @@ class CrossAttentionRefinementNet(nn.Module):
         features_y = features_y + pos_enc
         
         
-        desc0, desc1 = self.first_lin(features_x).transpose(1, 2), self.first_lin(features_y).transpose(1, 2) 
+        desc0, desc1 = self.first_lin(features_x).transpose(1, 2), self.first_lin(features_y).transpose(1, 2) # shape: (batch_size, n_in, num_points)
+        
+    #    print(f'desc0.shape: {desc0.shape}, desc1.shape: {desc1.shape}, desc0.device: {desc0.device}, desc1.device: {desc1.device}')
         for layer in self.layers:
             if self.cross_sampling_ratio == 1:
                 desc0 = desc0 + layer(desc0, desc1) # xi = xi + MLP([xi||mE→i])
