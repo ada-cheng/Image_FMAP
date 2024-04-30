@@ -48,3 +48,8 @@ If you find this repo useful or relevant to your project and research, please ki
       primaryClass={cs.CV}
 }
 ```
+
+## Acknowledgments
+We would like to thank the following open source efforts for pushing the boundary of image feature learning and functional map optimization:
+* [sd-dino](https://github.com/Junyi42/sd-dino)
+* [FmapLib](https://github.com/optas/FmapLib)
