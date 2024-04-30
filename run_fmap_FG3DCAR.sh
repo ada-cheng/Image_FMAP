@@ -59,6 +59,7 @@ echo "Done calculating FMAP"
 # run evaluation
 
 python eval_tss.py  \
+    --SUBSET FG3DCAR \
     --fmap_path data-tss/TSS_CVPR2016/FG3DCAR_fmap/ \
     --DINO_path data-tss/TSS_CVPR2016/FG3DCAR_feat_token_11_NOMASK \
     --SD_path data-tss/TSS_CVPR2016/FG3DCAR_sd \
@@ -104,6 +105,7 @@ echo "Done calculating FMAP"
 # run evaluation
 
 python eval_tss.py  \
+    --SUBSET FG3DCAR \
     --fmap_path data-tss/TSS_CVPR2016/FG3DCAR_fmap_2/ \
     --DINO_path data-tss/TSS_CVPR2016/FG3DCAR_feat_token_11_NOMASK \
     --SD_path data-tss/TSS_CVPR2016/FG3DCAR_sd \

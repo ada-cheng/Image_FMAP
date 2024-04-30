@@ -324,7 +324,7 @@ def run_evaluation_semantic( test_dataloader, device,
     
     fmap_file_prefix = FMAP_path
     
-    fmap_file_suffix = f'_tss/TIRAMISU_1999_batch_0_test.pt'
+    fmap_file_suffix = f'_tss/FMAP_1999_batch_0_test.pt'
     fmap_files = load_files(fmap_file_prefix, 200, fmap_file_suffix)
 
     for i_batch, mini_batch in pbar:
@@ -438,7 +438,7 @@ def main(args):
     target_transform = transforms.Compose([ArrayToTensor()])  # only put channel first
     input_transform = transforms.Compose([ArrayToTensor(get_float=False)])  # only put channel first
     output = {}
-    for sub_data in [ 'PASCAL']:
+    for sub_data in [ args.SUBSET]:
         test_set = TSSDataset(os.path.join(data_dir, sub_data),
                                                     source_image_transform=input_transform,
                                                     target_image_transform=input_transform, flow_transform=target_transform,
@@ -458,6 +458,7 @@ if __name__ == '__main__':
     parser.add_argument('--FMAP', action='store_true', default=True)
     parser.add_argument('--SD', action='store_true', default= True)
     parser.add_argument('--CAT', type=bool, default= False)
+    parser.add_argument('--SUBSET', type=str, default='PASCAL')
     parser.add_argument('--DINO_path', type=str, default='data-tss/TSS_CVPR2016/PASCAL_feat_token_11_NOMASK')
     parser.add_argument('--SD_path', type=str, default='data-tss/TSS_CVPR2016/PASCAL_sd_nomask')
     parser.add_argument('--FMAP_path', type=str, default='/home/xinle/fmlib/data-tss/TSS_CVPR2016_/PASCAL-fast-reim-cons-sdbasis-dinoloss/')

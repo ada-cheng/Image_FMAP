@@ -59,6 +59,7 @@ echo "Done calculating FMAP"
 # run evaluation
 
 python eval_tss.py  \
+    --SUBSET PASCAL \
     --fmap_path data-tss/TSS_CVPR2016/PASCAL_fmap/ \
     --DINO_path data-tss/TSS_CVPR2016/PASCAL_feat_token_11_NOMASK \
     --SD_path data-tss/TSS_CVPR2016/PASCAL_sd \
@@ -104,6 +105,7 @@ echo "Done calculating FMAP"
 # run evaluation
 
 python eval_tss.py  \
+    --SUBSET PASCAL \
     --fmap_path data-tss/TSS_CVPR2016/PASCAL_fmap_2/ \
     --DINO_path data-tss/TSS_CVPR2016/PASCAL_feat_token_11_NOMASK \
     --SD_path data-tss/TSS_CVPR2016/PASCAL_sd \
