@@ -13,7 +13,15 @@ We recommend the following commands to set up the environment.
 pip install -r requirements.txt
 pip install -e .
 ```
-
+## Data Preparation
+- TSS
+```bash
+sh tss.sh
+```
+- SPair-71k
+```bash
+sh spair.sh
+```
 ## Evaluations
 To reproduce the main results, run
 ```bash
@@ -28,7 +36,7 @@ sh run_fmap_FG3DCAR.sh
 
 ## Citation
 
-If you find Sequoia useful or relevant to your project and research, please kindly cite our paper:
+If you find this repo useful or relevant to your project and research, please kindly cite our paper:
 
 ```bibtex
 @misc{cheng2024zeroshot,
