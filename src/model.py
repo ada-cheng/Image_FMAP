@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from src.functional_map_gpu import Functional_Map
 from copy import deepcopy
-from flash_attn import flash_attn_qkvpacked_func, flash_attn_func
+from flash_attn import flash_attn_func
 import math
 
 def positional_encoding(seq_length, feature_dim):
@@ -61,10 +59,11 @@ class MultiHeadedAttention(nn.Module):
         v = value.permute(0, 3, 2, 1).reshape(batch_dim, -1, self.num_heads, self.dim).half()
         out = flash_attn_func(q, k, v)
         x = out.permute(0, 2, 3, 1).reshape(batch_dim, self.dim * self.num_heads, -1).float()
-  
+    #    x, _ = attention(query, key, value)
         return self.merge(x.contiguous().view(batch_dim, self.dim * self.num_heads, -1))
 
 
+    
 class AttentionalPropagation(nn.Module):
     def __init__(self, feature_dim: int, num_heads: int):
         super().__init__()
@@ -116,7 +115,7 @@ class CrossAttentionRefinementNet(nn.Module):
         
         desc0, desc1 = self.first_lin(features_x).transpose(1, 2), self.first_lin(features_y).transpose(1, 2) # shape: (batch_size, n_in, num_points)
         
-    #    print(f'desc0.shape: {desc0.shape}, desc1.shape: {desc1.shape}, desc0.device: {desc0.device}, desc1.device: {desc1.device}')
+
         for layer in self.layers:
             if self.cross_sampling_ratio == 1:
                 desc0 = desc0 + layer(desc0, desc1) # xi = xi + MLP([xi||mE→i])
@@ -140,3 +139,5 @@ class CrossAttentionRefinementNet(nn.Module):
         ref_feat_x, ref_feat_y = augmented_features_x[:, :, :self.n_in], augmented_features_y[:, :, :self.n_in]
         
         return ref_feat_x, ref_feat_y
+
+

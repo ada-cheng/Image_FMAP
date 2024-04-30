@@ -1,19 +1,42 @@
 # Image Feature Consensus with Deep Functional Maps
-This repository is the official implementation of the paper “Image Feature Consensus with Deep Functional Maps”.
-
+This repository is the official implementation of the paper [“Zero-Shot Image Feature Consensus with Deep Functional Maps”](https://arxiv.org/abs/2403.12038).
 
 
 ## Overview
 ![image](teaser.jpg)
 
 
-### Data Preprocess
-The Image Features can be generated via the command in [DATA.md](./assets/DATA.md).
+## Environment Set Up
+We recommend the following commands to set up the environment.
 
-### Functional Map Optimization
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
 
-The FMap can be generated via the command in [FMap_gen.md](./assets/FMap_gen.md)
+## Evaluations
+To reproduce the main results, run
+```bash
+sh run_fmap_pascal.sh
+sh run_fmap_JODS.sh
+sh run_fmap_FG3DCAR.sh
+```
 
-### Evaluation
+## TODOS
+- [ ] Release SPair-71k Evaluation code.
+- [ ] Release more results for TSS.
 
-The testing instruction is in [TEST.md](./assets/TEST.md).
+## Citation
+
+If you find Sequoia useful or relevant to your project and research, please kindly cite our paper:
+
+```bibtex
+@misc{cheng2024zeroshot,
+      title={Zero-Shot Image Feature Consensus with Deep Functional Maps}, 
+      author={Xinle Cheng and Congyue Deng and Adam Harley and Yixin Zhu and Leonidas Guibas},
+      year={2024},
+      eprint={2403.12038},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```

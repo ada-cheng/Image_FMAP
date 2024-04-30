@@ -1,0 +1,7 @@
+flash-attn==2.5.2
+torch==2.1.0
+torch_geometric==2.4.0
+torchaudio==0.9.1
+torchmetrics==0.6.0
+torchvision==0.16.0
+transformers==4.26.1

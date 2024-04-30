@@ -9,7 +9,20 @@ import torch.nn.functional as F
 
 
 def l1_and_frobenius_norms_cvx(sourcefeat, targetfeat): # F.matmul(sourcefeat) = targetfeat
-    pass # TODO: implement this
+    F = cp.Variable((sourcefeat.shape[0], targetfeat.shape[0]))
+    sourcefeat = sourcefeat.cpu().numpy()
+    targetfeat = targetfeat.cpu().numpy()
+    residual = cp.norm(cp.matmul(F, sourcefeat) - targetfeat, 'fro')
+    problem = cp.Problem(cp.Minimize(residual), [F >= 0])
+
+    # Solve the problem
+    problem.solve()
+    # Print the status of the solution
+    print("Problem Status: %s"%problem.status)
+    # Print the optimal value
+    print("Optimal Value: %s"%residual.value)
+    
+    return torch.tensor(F.value, device = torch.device('cuda' if torch.cuda.is_available() else 'cpu'), dtype = torch.float), residual.value
 
 methods = {"l1":l1_and_frobenius_norms_cvx}
 
@@ -59,7 +72,7 @@ class Functional_Map:
         proj_data1 = self.laplacian_matrix.project_functions(self.eigen_num, self.src_data.reshape((-1,self.dim)))
         proj_data2 = self.laplacian_matrix_.project_functions(self.eigen_num, self.tgt_data.reshape((-1,self.dim)))
         transition_matrix,_ = methods[self.method](proj_data1, proj_data2)
-        print("res",torch.norm(torch.matmul(transition_matrix, proj_data1) - proj_data2, p = "fro"))
+  
         return transition_matrix
     
     def project(self, data):
@@ -77,6 +90,3 @@ class Functional_Map:
         return transfer_data, inverse_transfer_data
         
     
-    
-if __name__ == "__main__":
-    pass

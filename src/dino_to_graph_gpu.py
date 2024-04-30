@@ -4,6 +4,7 @@ import torch
 import torch_geometric.datasets 
 import torch_geometric.utils 
 import networkx as nx
+import numpy as np
 class Image_Graph():
     def __init__(self, in_image_feat=None,*args):
         """
@@ -52,10 +53,14 @@ class Image_Graph():
             # feature distance
             num_nodes = self.graph.num_nodes
             if use_dino:
+                self.graph.edge_index = self.graph.edge_index.to(features.device)
                 features = features.reshape((num_nodes, -1))
                 f_from = features[self.graph.edge_index[0]]
                 f_to = features[self.graph.edge_index[1]]
-                feat_values = torch.norm(f_from - f_to, dim=1)
+                feat_values = torch.norm(f_from - f_to, dim=1) 
+                feat_val_offset  = feat_values - feat_values.mean()
+                feat_val_offset = feat_val_offset / 5
+                feat_values = feat_values.mean() + feat_val_offset
             else:
                 feat_values = torch.ones((self.graph.edge_index.shape[-1],), device = self.device)
             spatial_values = torch.ones((self.graph.num_edges), device = self.device)
@@ -63,8 +68,10 @@ class Image_Graph():
             feat_values = torch.exp(-torch.square(feat_values) / sigma_f)
             sigma_s = check_and_derive_sigma(sigma_s, spatial_values)
             spatial_values = torch.exp(-torch.square(spatial_values) / sigma_s)
+            spatial_values = spatial_values.to(feat_values.device)
             feat_values = torch.mul(feat_values, spatial_values)
             self.graph.edge_attr = feat_values
+       
         else:
             raise ValueError("Not implemented yet.")
             
@@ -79,3 +86,5 @@ def check_and_derive_sigma(sigma, values):
         return sigma
 
 
+
+                    
